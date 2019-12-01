@@ -7,15 +7,13 @@ import java.nio.file.Paths;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        
-        var totalFuelRequirement = Files.readAllLines(Paths.get("1.in"))
-                .stream()
+
+        var totalFuelRequirement = Files.lines(Paths.get("1.in"))
                 .mapToInt(Integer::parseInt)
                 .map(Main::calculateRequiredFuel)
                 .sum();
-        
-        var adjustedFuelRequirement = Files.readAllLines(Paths.get("1.in"))
-                .stream()
+
+        var adjustedFuelRequirement = Files.lines(Paths.get("1.in"))
                 .mapToInt(Integer::parseInt)
                 .map(Main::calculateAdjustedFuel)
                 .sum();
