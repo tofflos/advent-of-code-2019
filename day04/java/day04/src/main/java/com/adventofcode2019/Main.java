@@ -1,29 +1,20 @@
 package com.adventofcode2019;
 
-import java.io.IOException;
 import java.util.stream.IntStream;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         System.out.println("Part 1: " + IntStream.range(134564, 585159)
                 .mapToObj(i -> String.valueOf(i))
-                .filter(Main::isValid1)
+                .filter(s -> hasPair(s) && isSameOrMore(s))
                 .count());
 
         System.out.println("Part 2: " + IntStream.range(134564, 585159)
                 .mapToObj(i -> String.valueOf(i))
-                .filter(Main::isValid2)
+                .filter(s -> hasIsolatedPair(s) && isSameOrMore(s))
                 .count());
-    }
-
-    static boolean isValid1(String digits) {
-        return digits.length() == 6 && hasPair(digits) && isSameOrMore(digits);
-    }
-
-    static boolean isValid2(String digits) {
-        return digits.length() == 6 && hasIsolatedPair(digits) && isSameOrMore(digits);
     }
 
     static boolean hasPair(String digits) {
