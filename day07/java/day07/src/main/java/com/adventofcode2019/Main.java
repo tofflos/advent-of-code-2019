@@ -13,44 +13,44 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        var initialState = Arrays.stream(Files.readString(Paths.get("1.in")).split(",")).mapToInt(Integer::parseInt).toArray();
+        var program = Arrays.stream(Files.readString(Paths.get("1.in")).split(",")).mapToInt(Integer::parseInt).toArray();
 
-        System.out.println("Part 1: " + permutations(0, 5).stream().mapToInt(p -> chain(initialState, p)).max().orElseThrow());
-        System.out.println("Part 2: " + permutations(5, 10).stream().mapToInt(p -> feedback(initialState, p)).max().orElseThrow());
+        System.out.println("Part 1: " + permutations(0, 5).stream().mapToInt(p -> chain(program, p)).max().orElseThrow());
+        System.out.println("Part 2: " + permutations(5, 10).stream().mapToInt(p -> feedback(program, p)).max().orElseThrow());
     }
 
-    static int chain(int[] initialState, List<Integer> phases) {
+    static int chain(int[] program, List<Integer> phases) {
 
-        var a = new Computer(initialState);
+        var a = new Computer(program);
         a.getInput().addAll(List.of(phases.get(0), 0));
         a.run();
 
-        var b = new Computer(initialState);
+        var b = new Computer(program);
         b.getInput().addAll(List.of(phases.get(1), a.getOutput().poll()));
         b.run();
 
-        var c = new Computer(initialState);
+        var c = new Computer(program);
         c.getInput().addAll(List.of(phases.get(2), b.getOutput().poll()));
         c.run();
 
-        var d = new Computer(initialState);
+        var d = new Computer(program);
         d.getInput().addAll(List.of(phases.get(3), c.getOutput().poll()));
         d.run();
 
-        var e = new Computer(initialState);
+        var e = new Computer(program);
         e.getInput().addAll(List.of(phases.get(4), d.getOutput().poll()));
         e.run();
 
         return e.getOutput().poll();
     }
 
-    static int feedback(int[] initialState, List<Integer> phases) {
+    static int feedback(int[] program, List<Integer> phases) {
 
-        var a = new Computer(initialState);
-        var b = new Computer(initialState);
-        var c = new Computer(initialState);
-        var d = new Computer(initialState);
-        var e = new Computer(initialState);
+        var a = new Computer(program);
+        var b = new Computer(program);
+        var c = new Computer(program);
+        var d = new Computer(program);
+        var e = new Computer(program);
 
         a.getInput().add(phases.get(0));
         b.getInput().add(phases.get(1));
@@ -111,7 +111,7 @@ public class Main {
 
 class Computer implements Runnable {
 
-    private final int[] state;
+    private final int[] memory;
     private int ptr;
 
     private final Queue<Integer> input;
@@ -126,8 +126,8 @@ class Computer implements Runnable {
         COMPLETED
     }
 
-    public Computer(int[] initialState) {
-        this.state = Arrays.copyOf(initialState, initialState.length);
+    public Computer(int[] program) {
+        this.memory = Arrays.copyOf(program, program.length);
         this.ptr = 0;
         this.input = new LinkedList<>();
         this.output = new LinkedList<>();
@@ -152,56 +152,56 @@ class Computer implements Runnable {
 
         loop:
         while (true) {
-            int opcode = state[ptr++];
+            int opcode = memory[ptr++];
 
             switch (opcode) {
                 case 1-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = state[a] + state[b];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = memory[a] + memory[b];
                 }
                 case 101-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = a + state[b];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = a + memory[b];
                 }
                 case 1101-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = a + b;
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = a + b;
                 }
                 case 1001-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = state[a] + b;
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = memory[a] + b;
                 }
                 case 2-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = state[a] * state[b];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = memory[a] * memory[b];
                 }
                 case 102-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = a * state[b];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = a * memory[b];
                 }
                 case 1102-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = a * b;
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = a * b;
                 }
                 case 1002-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
-                    state[c] = state[a] * b;
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
+                    memory[c] = memory[a] * b;
                 }
                 case 3-> {
                     if (input.isEmpty()) {
@@ -210,128 +210,128 @@ class Computer implements Runnable {
                         return;
                     }
 
-                    int a = state[ptr++];
-                    state[a] = input.poll();
+                    int a = memory[ptr++];
+                    memory[a] = input.poll();
                 }
                 case 4-> {
-                    int a = state[ptr++];
-                    output.add(state[a]);
+                    int a = memory[ptr++];
+                    output.add(memory[a]);
                 }
                 case 104-> {
-                    int a = state[ptr++];
+                    int a = memory[ptr++];
                     output.add(a);
                 }
                 case 5-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
 
-                    if (state[a] != 0) {
-                        ptr = state[b];
+                    if (memory[a] != 0) {
+                        ptr = memory[b];
                     }
                 }
                 case 1105-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
 
                     if (a != 0) {
                         ptr = b;
                     }
                 }
                 case 1005-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
 
-                    if (state[a] != 0) {
+                    if (memory[a] != 0) {
                         ptr = b;
                     }
                 }
                 case 105-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
 
                     if (a != 0) {
-                        ptr = state[b];
+                        ptr = memory[b];
                     }
                 }
                 case 1106-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
 
                     if (a == 0) {
                         ptr = b;
                     }
                 }
                 case 1006-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
 
-                    if (state[a] == 0) {
+                    if (memory[a] == 0) {
                         ptr = b;
                     }
                 }
                 case 106-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
 
                     if (a == 0) {
-                        ptr = state[b];
+                        ptr = memory[b];
                     }
                 }
                 case 7-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = state[a] < state[b] ? 1 : 0;
+                    memory[c] = memory[a] < memory[b] ? 1 : 0;
                 }
                 case 107-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = a < state[b] ? 1 : 0;
+                    memory[c] = a < memory[b] ? 1 : 0;
                 }
                 case 1007-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = state[a] < b ? 1 : 0;
+                    memory[c] = memory[a] < b ? 1 : 0;
                 }
                 case 1107-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = a < b ? 1 : 0;
+                    memory[c] = a < b ? 1 : 0;
                 }
                 case 8-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = state[a] == state[b] ? 1 : 0;
+                    memory[c] = memory[a] == memory[b] ? 1 : 0;
                 }
                 case 108-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = a == state[b] ? 1 : 0;
+                    memory[c] = a == memory[b] ? 1 : 0;
                 }
                 case 1008-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = state[a] == b ? 1 : 0;
+                    memory[c] = memory[a] == b ? 1 : 0;
                 }
                 case 1108-> {
-                    int a = state[ptr++];
-                    int b = state[ptr++];
-                    int c = state[ptr++];
+                    int a = memory[ptr++];
+                    int b = memory[ptr++];
+                    int c = memory[ptr++];
 
-                    state[c] = a == b ? 1 : 0;
+                    memory[c] = a == b ? 1 : 0;
                 }
                 case 99-> {
                     status = Status.COMPLETED;
